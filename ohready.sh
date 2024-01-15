@@ -16,15 +16,24 @@ CLReset="\033[0m"
 # setaf => Foreground
 
 get_server_name() {
-    read -p "Enter server name: " server_name
-    export NameInstance=$server_name
-    echo "Selected server: $server_name"
+    read -p "Enter server name: " InstanceName
+    export NameInstance=$InstanceName
+    echo "Updating .bashrc: $NameInstance"
+    echo "export SERVER_NAME=\"$NameInstance\"" >> ~/.bashrc
+    source ~/.bashrc
+
+    read -p "Press Enter to continue..."
 }
 
 get_project_name() {
-    read -p "Enter server name: " project_name
+    read -p "Enter project name: " project_name
     export NameProject=$project_name
-    echo "Selected server: $project_name"
+    echo "Selected project: $project_name"
+
+    mkdir -p ~/projects/$project_name;
+    echo "Project folder is created on ~/projects/$project_name"
+    read -p "Press Enter to continue..."
+
 }
 
 # Bright pink 198
@@ -89,8 +98,8 @@ display_main_menu() {
     echo ""
     ohWarn 1 "Configure Server"
     ohNode 2 "Install Node Tools" 
-    ohLog 3 "Install Server & DB"
-    ohInfo 4 "Install Utilities"
+    ohInfo 3 "Install Server & DB"
+    ohLog 4 "Utilities"
     ohError 0 "Exit"
     # echo "Main Menu:"
     # echo "1. Configure Server"
@@ -114,37 +123,38 @@ display_node_submenu() {
     ohNode 1 "Install Node Version Manager"
     ohNode 2 "Just Node JS"
     echo ""
-    ohAlert 0 "Back"
-    ohError 00 "Exit"
+    ohWarn "0 " "Back"
+    ohAlert 00 "Exit"
 }
 
 display_http_submenu() {
     clear
-    ohLog "Server & DB Installation"
-    ohLog 1 "Install Nginx"
-    ohLog 2 "Set Nginx Firewall settings"
-    ohLog 3 "Nginx Let's Encrypt"
-    ohLog 4 "Install PostgreSQL"
-    ohLog 5 "Install MySQL"
-    ohLog 6 "Install MongoDB"
+    ohInfo "Server & DB Installation"
+    ohInfo 1 "Install Nginx"
+    ohInfo 2 "Set Nginx Firewall settings"
+    ohInfo 3 "Nginx Let's Encrypt"
+    ohInfo 4 "Install PostgreSQL"
+    ohInfo 5 "Install MySQL"
+    ohInfo 6 "Install MongoDB"
     echo ""
-    ohAlert 0 "Back"
-    ohError 00 "Exit"
+    ohWarn "0 " "Back"
+    ohAlert 00 "Exit"
 }
 
 display_util_submenu() {
     clear
-    ohInfo "Utilities"
-    ohInfo 1 "Install Neovim"
-    ohInfo 2 "Cloudflare Tunnel Script"
-    ohInfo 3 "Cloudflare DDNS Script"
-    ohInfo 4 "Firewall Status"
-    ohInfo 5 "Firewall Enable"
-    ohInfo 6 "Firewall Disable"
-    ohInfo 7 "Port Search"
+    ohLog "Utilities"
+    ohLog 1 "Install Neovim"
+    ohLog 2 "Cloudflare Tunnel Script"
+    ohLog 3 "Cloudflare DDNS Script"
+    ohLog 4 "Firewall Status"
+    ohLog 5 "Firewall Enable"
+    ohLog 6 "Firewall Disable"
+    ohLog 7 "Port Search"
+    ohLog 8 "Install Syncthing"
     echo ""
-    ohAlert "0 " "Back"
-    ohError 00 "Exit"
+    ohWarn "0 " "Back"
+    ohAlert 00 "Exit"
 }
 
 updateSystem () {
@@ -161,7 +171,7 @@ updateSystem () {
 }
 
 ohPortSearch(){
-    echo -n "Enter port number"
+    echo -n "Enter port number: "
     read -r port
     ohLog "Searching for port" $port
     sudo lsof -nP -i4TCP:$port | grep LISTEN
