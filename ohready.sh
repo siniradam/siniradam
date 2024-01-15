@@ -1,16 +1,48 @@
 #!/usr/bin/env bash
+
+CLBlueOnWhite="\033[48;5;020m"
+CLCyanOnBlack="\033[48;5;051m\033[38;5;016m"
+CLYellowOnBlack="\033[48;5;220m\033[38;5;016m"
+CLOrangeOnBlack="\033[48;5;202m\033[38;5;016m"
+CLRedOnWhite="\033[48;5;160m\033[38;5;015m"
+CLGrayOnGreen="\033[244;5;160m\033[38;5;015m"
+#CLGrayOnGreen="\033[244;5;160m\033[38;5;015m" # This blinks
+CLReset="\033[0m"
+# PALETTE_BLINK="\e[5m"
+# PALETTE_RESET='\e[0m'
+# normal=$'\e[0m'
+
+# setab => Background
+# setaf => Foreground
+
+get_server_name() {
+    read -p "Enter server name: " server_name
+    export NameInstance=$server_name
+    echo "Selected server: $server_name"
+}
+
+get_project_name() {
+    read -p "Enter server name: " project_name
+    export NameProject=$project_name
+    echo "Selected server: $project_name"
+}
+
+# Bright pink 198
+
 function ohCredits()
 {
-   echo -e "\033[45m\
+    tput setab 161
+   echo -e "\
 
-  ____  _      _____ _     _  __ _   
- / __ \| |    / ____| |   (_)/ _| |  
-| |  | | |__ | (___ | |__  _| |_| |_ 
-| |  | | '_ \ \___ \| '_ \| |  _| __|
-| |__| | | | |____) | | | | | | | |_ 
- \____/|_| |_|_____/|_| |_|_|_|  \__|
-                                     "
-echo -e "\033[0m   Toolkit Installer - ohshift.io"
+     ____  _      _____ _     _  __ _      
+    / __ \| |    / ____| |   (_)/ _| |     
+   | |  | | |__ | (___ | |__  _| |_| |_    
+   | |  | | '_ \ \___ \| '_ \| |  _| __|   
+   | |__| | | | |____) | | | | | | | |_    
+    \____/|_| |_|_____/|_| |_|_|_|  \__|   
+                                           "
+tput setab 198 
+echo -e "   Toolkit Installer - ohshift.io          \033[0m"
 }
 
 # Tools
@@ -25,36 +57,95 @@ ohPM2 () {
 
 # Log Tools
 ohLog(){
-    echo -e "\033[48;5;020m => $1:\033[0m $2"
+    echo -e "$CLBlueOnWhite => $1 $CLReset $2"
 }
 
 ohInfo(){
-    echo -e "\033[48;5;051m \033[38;5;016m=> $1:\033[0m $2"
+    echo -e "$CLCyanOnBlack => $1 $CLReset $2"
 }
 
 ohWarn(){
-    echo -e "\033[48;5;220m \033[38;5;016m=> $1:\033[0m $2"
+    echo -e "$CLYellowOnBlack => $1 $CLReset $2"
 }
 
 ohAlert(){
-    echo -e "\033[48;5;202m \033[38;5;016m=> $1:\033[0m $2"
+    echo -e "$CLOrangeOnBlack => $1 $CLReset $2"
 }
 
 ohError(){
-    echo -e "\033[48;5;160m \033[38;5;015m=> $1:\033[0m $2"
+    echo -e "$CLRedOnWhite => $1 $CLReset $2"
 }
 
+ohNode(){
+    tput setab 118
+    tput setaf 237
+    echo -e " => $1 $CLReset $2"
+}
 
+# Function to display the main menu
+display_main_menu() {
+    clear
+    ohCredits
+    echo ""
+    ohWarn 1 "Configure Server"
+    ohNode 2 "Install Node Tools" 
+    ohLog 3 "Install Server & DB"
+    ohInfo 4 "Install Utilities"
+    ohError 0 "Exit"
+    # echo "Main Menu:"
+    # echo "1. Configure Server"
+    # echo "2. Manage Applications"
+    # echo "0. Exit"
+}
 
+display_server_submenu() {
+    clear
+    ohWarn "Server Configuration"
+    ohWarn 1 "Set Servername"
+    ohWarn 2 "Create Project" 
+    echo ""
+    ohAlert 0 "Back"
+    ohError 00 "Exit"
+}
 
-# Samples
-# ohInfo "Fetching  " "OS Updates"  # Light Bule
-# ohInfo "Loading   " "NVM"         # Light Bule
-# ohLog "Upgrading " "OS"           # Purple
-# ohLog "Updating  " "Permissions"  # Purple
-# ohWarn "Installing" "OS Updates"  # Yellow
-# ohAlert "Scheiße   " "OS Updates" # Orange
-# ohError "Error     " "OS Updates" # Red
+display_node_submenu() {
+    clear
+    ohNode "NodeJS Menu"
+    ohNode 1 "Install Node Version Manager"
+    ohNode 2 "Just Node JS"
+    echo ""
+    ohAlert 0 "Back"
+    ohError 00 "Exit"
+}
+
+display_http_submenu() {
+    clear
+    ohLog "Server & DB Installation"
+    ohLog 1 "Install Nginx"
+    ohLog 2 "Set Nginx Firewall settings"
+    ohLog 3 "Nginx Let's Encrypt"
+    ohLog 4 "Install PostgreSQL"
+    ohLog 5 "Install MySQL"
+    ohLog 6 "Install MongoDB"
+    echo ""
+    ohAlert 0 "Back"
+    ohError 00 "Exit"
+}
+
+display_util_submenu() {
+    clear
+    ohInfo "Utilities"
+    ohInfo 1 "Install Neovim"
+    ohInfo 2 "Cloudflare Tunnel Script"
+    ohInfo 3 "Cloudflare DDNS Script"
+    ohInfo 4 "Firewall Status"
+    ohInfo 5 "Firewall Enable"
+    ohInfo 6 "Firewall Disable"
+    ohInfo 7 "Port Search"
+    echo ""
+    ohAlert "0 " "Back"
+    ohError 00 "Exit"
+}
 
 updateSystem () {
     ohInfo "Fetching  " "OS Updates"
@@ -69,7 +160,17 @@ updateSystem () {
     sudo apt upgrade
 }
 
+ohPortSearch(){
+    echo -n "Enter port number"
+    read -r port
+    ohLog "Searching for port" $port
+    sudo lsof -nP -i4TCP:$port | grep LISTEN
+    read -p "Press Enter to continue..."
+}
+
+
 installNVM () {
+    ohLog "Installing" "NVM"
 
     if ! command -v nvm &> /dev/null
     then
@@ -95,6 +196,7 @@ installNVM () {
 }
 
 installNodeJS () {
+    ohLog "Installing" "NodeJS"
     if ! command -v node &> /dev/null
     then
         ohInfo "Fetching  " "NodeJS"
@@ -128,17 +230,18 @@ installNginxLets () {
 }
 
 installNginx () {
-# Install
+    ohLog "Installing" "Nginx"
+    # Install
     sudo apt update
     sudo apt install nginx
 
-# Firewall
+    # Firewall
     sudo ufw app list
     sudo ufw allow 'Nginx Full'
     sudo ufw status
 }
 
-ohPSQL () {
+installPSQL () {
     ohLog "Installing" "PostgreSQL"
     sudo apt install postgresql postgresql-contrib
     
@@ -147,41 +250,201 @@ ohPSQL () {
     sudo -i -u postgres
 }
 
+installMYSQL(){
 
-#FN: Set a Machine Name
-#Install Text Editor.
+    ohLog "Installing" "MySQL"
+}
 
+installMongoDB(){
+    ohLog "Installing" "MongoDB"
+}
 
+cloudflareTunnel(){
+    ohAlert "Installing" "Cloudflare Tunnel Helper"
+}
 
-
-# if ! command -v nvim &> /dev/null
-# then
-# else
-#     ohLog "Found     " "Neovim, skipping."
-# fi
-
-
-if [ "$1" = '' ]; then
-    ohCredits
-    echo ""
-    ohInfo "Param\t" "Package"
-    ohLog "update\t" "Apt Update & Upgrade"
-    ohLog "neovim\t" "NeoVIM"
-    ohLog "nvm\t\t" "Node Version Manager"
-    ohLog "node\t" "Node JS"
-    ohLog "psql\t" "PostgreSQL"
-    ohLog "pm2\t\t" "PM2 - Process Manager"
-    echo ""
-    ohInfo "Param\t" "Output"
-    ohAlert "pp\t\t" "Creates default projects path"
-    ohAlert "osi\t\t" "OS Info"
-    ohAlert "osi\t\t" "OS Info"
-elif [ "$1" = 'neovim' ]; then
-    ohInfo "Fetching  " "NeoVIM"
-    ohInfo "Permissions" "NeoVIM"
-    ohWarn "Starting  " "NeoVIM"
-    # ohLog "App     " "OK."
-fi
+cloudflareDDNS(){
+    ohAlert "Generating" "Cloudflare DDNS Script"
+}
 
 
-# updateSystem
+firewallEnable(){
+    sudo ufw enable
+}
+
+firewallDisable(){
+    sudo ufw disable
+}
+
+firewallStatus(){
+    sudo ufw status
+    sudo ufw app list
+}
+
+firewallAllow(){
+    sudo ufw allow 'Nginx Full'
+}
+
+closeApp(){
+    tput setab 232
+    tput setaf 213 
+    clear
+    echo -e "Thanks for using, exiting..."
+    
+    exit 0
+
+}
+
+while true; do
+    display_main_menu
+
+    read -p "Enter your choice (0-4): " main_choice
+
+    case $main_choice in
+        1)
+            # Submenu for server configuration
+            while true; do
+                display_server_submenu
+
+                read -p "Enter your choice (0-2): " server_choice
+
+                case $server_choice in
+                    1)
+                        get_server_name
+                        ;;
+                    2)
+                        get_project_name
+                        ;;
+                    0)
+                        break
+                        ;;
+                    00)
+                        closeApp
+                        ;;
+                    *)
+                        echo "Invalid choice. Please enter a valid option."
+                        ;;
+                esac
+
+                # read -p "Press Enter to continue..."
+            done
+            ;;
+        2)
+            while true; do
+                display_node_submenu
+
+                read -p "Enter your choice (0-2): " node_choice
+
+                case $node_choice in
+                    1)
+                        installNVM
+                        ;;
+                    2)
+                        installNodeJS
+                        ;;                        
+                    0)
+                        break
+                        ;;
+                    00)
+                        closeApp
+                        ;;
+                    *)
+                        echo "Invalid choice. Please enter a valid option."
+                        ;;
+                esac
+
+                # read -p "Press Enter to continue..."
+            done
+            ;;
+        3)
+            while true; do
+                display_http_submenu
+
+                read -p "Enter your choice (0-6): " http_choice
+
+                case $http_choice in
+                    1)
+                        installNginx
+                        ;;
+                    2)
+                        installNodeJS
+                        ;;
+                    3)
+                        installNginxLets
+                        ;;
+                    4)
+                        installPSQL
+                        ;;
+                    5)
+                        installMYSQL
+                        ;;
+                    6)
+                        installMongoDB
+                        ;;
+                    0)
+                        break
+                        ;;
+                    00)
+                        closeApp
+                        ;;
+                    *)
+                        echo "Invalid choice. Please enter a valid option."
+                        ;;
+                esac
+
+                # read -p "Press Enter to continue..."
+            done
+            ;;
+        4)
+            while true; do
+                display_util_submenu
+
+                read -p "Enter your choice (0-7): " util_choice
+
+                case $util_choice in
+                    1)
+                        installNeovim
+                        ;;
+                    2)
+                        cloudflareTunnel
+                        ;;
+                    3)
+                        cloudflareDDNS
+                        ;;
+                    4)
+                        firewallStatus
+                        ;;
+                    5)
+                        firewallEnable
+                        ;;
+                    6)
+                        firewallDisable
+                        ;;
+                    7)
+                        ohPortSearch
+                        ;;
+                    0)
+                        break
+                        ;;
+                    00)
+                        closeApp
+                        ;;
+                    *)
+                        echo "Invalid choice. Please enter a valid option."
+                        ;;
+                esac
+
+                # read -p "Press Enter to continue..."
+            done
+            ;;
+        0)
+            closeApp
+            ;;
+        *)
+            echo "Invalid choice. Please enter a valid option."
+            ;;
+    esac
+
+    # read -p "Press Enter to continue..."
+done
+
